@@ -309,6 +309,7 @@ function plugin_formcreator_hook() {
       PluginFormcreatorCommon::class, 'hookPostShowTab',
    ];
 
+
    // Load JS and CSS files if we are on a page which need them
    if (isset($_SERVER['REQUEST_URI'])) {
       if (strpos($_SERVER['REQUEST_URI'], 'formcreator') !== false
@@ -332,12 +333,24 @@ function plugin_formcreator_hook() {
                'dashboard',
                'gridstack'
             ];
+
          }
          if (strpos($_SERVER['REQUEST_URI'], 'issue.php') !== false) {
             $CFG_GLPI['javascript']['self-service']['none'] = [
                'dashboard',
                'gridstack'
             ];
+
+            if (PluginFormcreatorEntityconfig::getUsedConfig('is_search_issue_visible', Session::getActiveEntity()) == PluginFormcreatorEntityconfig::CONFIG_SEARCH_ISSUE_HIDDEN) {
+               $PLUGIN_HOOKS['add_javascript']['formcreator'][] = 'js/searchissue.js';
+            }
+         }
+
+
+         if (strpos($_SERVER['REQUEST_URI'], 'wizard.php') !== false) {
+            if (PluginFormcreatorEntityconfig::getUsedConfig('is_search_issue_visible', Session::getActiveEntity()) == PluginFormcreatorEntityconfig::CONFIG_SEARCH_ISSUE_HIDDEN) {
+               $PLUGIN_HOOKS['add_javascript']['formcreator'][] = 'js/searchissue.js';
+            }
          }
       }
    }

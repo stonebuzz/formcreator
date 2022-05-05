@@ -637,11 +637,15 @@ PluginFormcreatorTranslatableInterface
    }
 
    public function showWizard() : void {
-      echo '<div id="plugin_formcreator_wizard_categories" class="card">';
-      echo '<div><h2 class="card-title">'._n("Category", "Categories", 2, 'formcreator').'</h2></div>';
-      echo '<div class="slinky-menu"></div>';
-      echo '<div><a href="#" id="wizard_seeall">' . __('See all', 'formcreator') . '</a></div>';
-      echo '</div>';
+
+      if (PluginFormcreatorEntityconfig::getUsedConfig('is_categorie_visible', Session::getActiveEntity()) == PluginFormcreatorEntityconfig::CONFIG_CATEGORIE_VISIBLE) {
+         echo '<div id="plugin_formcreator_wizard_categories" class="card">';
+         echo '<div><h2 class="card-title">'._n("Category", "Categories", 2, 'formcreator').'</h2></div>';
+         echo '<div class="slinky-menu"></div>';
+         echo '<div><a href="#" id="wizard_seeall">' . __('See all', 'formcreator') . '</a></div>';
+         echo '</div>';
+      }
+
 
       echo '<div id="plugin_formcreator_wizard_right" class="card">';
       echo '<div class="card-body">';
@@ -656,8 +660,14 @@ PluginFormcreatorTranslatableInterface
          $this->showSearchBar();
          echo '</div>';
       }
+
+
+      $display_sort = "";
+      if (PluginFormcreatorEntityconfig::getUsedConfig('is_sort_visible', Session::getActiveEntity()) == PluginFormcreatorEntityconfig::CONFIG_SORT_HIDDEN) {
+         $display_sort = "display:none";
+      }
       $sort_settings = PluginFormcreatorEntityConfig::getEnumSort();
-      echo '<div class="plugin_formcreator_sort">';
+      echo '<div class="plugin_formcreator_sort" style="'.$display_sort.'">';
       echo '<span class="radios">';
       $sort_order = PluginFormcreatorEntityconfig::getUsedConfig('sort_order', Session::getActiveEntity());
       $selected = $sort_order == PluginFormcreatorEntityconfig::CONFIG_SORT_POPULARITY ? 'checked="checked"' : '';
@@ -678,6 +688,7 @@ PluginFormcreatorTranslatableInterface
       echo Html::scriptblock("$(function() {
          plugin_formcreator.updateWizardFormsView();
       });");
+
    }
 
    /**

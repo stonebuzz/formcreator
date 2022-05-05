@@ -48,6 +48,24 @@ class PluginFormcreatorUpgradeTo2_13 {
       $this->addTargetValidationSetting();
       $this->addFormVisibility();
       $this->addRequestSourceSetting();
+      $this->addEntityOption();
+   }
+
+   public function addEntityOption() {
+
+      $table = 'glpi_plugin_formcreator_entityconfigs';
+      $this->migration->addField($table, 'is_reservation_visible', 'integer', ['after' => 'is_header_visible', 'value' => '-2']);
+      $this->migration->addField($table, 'is_faq_visible', 'integer', ['after' => 'is_reservation_visible', 'value' => '-2']);
+      $this->migration->addField($table, 'is_categorie_visible', 'integer', ['after' => 'is_faq_visible', 'value' => '-2']);
+      $this->migration->addField($table, 'is_sort_visible', 'integer', ['after' => 'is_categorie_visible', 'value' => '-2']);
+      $this->migration->addField($table, 'is_search_issue_visible', 'integer', ['after' => 'is_sort_visible', 'value' => '-2']);
+
+      $this->migration->addPostQuery("UPDATE `glpi_plugin_formcreator_entityconfigs` SET `is_reservation_visible`=1 WHERE `entities_id`=0");
+      $this->migration->addPostQuery("UPDATE `glpi_plugin_formcreator_entityconfigs` SET `is_faq_visible`=1 WHERE `entities_id`=0");
+      $this->migration->addPostQuery("UPDATE `glpi_plugin_formcreator_entityconfigs` SET `is_categorie_visible`=1 WHERE `entities_id`=0");
+      $this->migration->addPostQuery("UPDATE `glpi_plugin_formcreator_entityconfigs` SET `is_sort_visible`=1 WHERE `entities_id`=0");
+      $this->migration->addPostQuery("UPDATE `glpi_plugin_formcreator_entityconfigs` SET `is_search_issue_visible`=1 WHERE `entities_id`=0");
+
    }
 
    public function addFormAnswerTitle() {

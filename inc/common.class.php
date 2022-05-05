@@ -757,22 +757,25 @@ JAVASCRIPT;
          $newMenu = [];
          $newMenu['seek_assistance'] = [
             'default' => Plugin::getWebDir('formcreator', false) . '/front/wizard.php',
-            'title'   => __('Seek assistance', 'formcreator'),
+            'title'   => __('Assistance', 'formcreator'), //PATCH
             'icon'    => 'fa-fw ti ti-headset',
          ];
-         $newMenu['my_assistance_requests'] = [
+         //PATCH
+         /*$newMenu['my_assistance_requests'] = [
             'default' => PluginFormcreatorIssue::getSearchURL(false),
             'title'   => __('My requests for assistance', 'formcreator'),
             'icon'    => 'fa-fw ti ti-list',
-         ];
+         ];*/
 
          if (PluginFormcreatorEntityConfig::getUsedConfig('is_kb_separated', Session::getActiveEntity()) == PluginFormcreatorEntityConfig::CONFIG_KB_DISTINCT
+            && PluginFormcreatorEntityConfig::getUsedConfig('is_faq_visible', Session::getActiveEntity()) == PluginFormcreatorEntityConfig::CONFIG_FAQ_VISIBLE
             && Session::haveRight('knowbase', KnowbaseItem::READFAQ)
          ) {
             $newMenu['faq'] = $menus['faq'];
             $newMenu['faq']['default'] = Plugin::getWebDir('formcreator', false) . '/front/knowbaseitem.php';
          }
-         if (Session::haveRight("reservation", ReservationItem::RESERVEANITEM)) {
+         if (PluginFormcreatorEntityConfig::getUsedConfig('is_reservation_visible', Session::getActiveEntity()) == PluginFormcreatorEntityConfig::CONFIG_RESERVATION_VISIBLE
+            && Session::haveRight("reservation", ReservationItem::RESERVEANITEM)) {
             if (isset($menus['reservation'])) {
                $newMenu['reservation'] = $menus['reservation'];
             }
@@ -796,6 +799,11 @@ JAVASCRIPT;
                'icon'    => 'fa-fw ti ti-rss',
             ];
          }
+
+         if(count($newMenu) == 1) {
+            return [];
+         }
+
          return $newMenu;
       }
 

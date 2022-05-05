@@ -1,4 +1,5 @@
-<?php
+"use strict";
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -29,42 +30,13 @@
  * ---------------------------------------------------------------------
  */
 
-include ('../../../inc/includes.php');
+$(function() {
+   $('a[href*="front/preference.php"]').hide();
+   $('body').addClass("navbar-collapsed");
 
-// Check if plugin is activated...
-if (!(new Plugin())->isActivated('formcreator')) {
-   Html::displayNotFoundError();
-}
-
-if (! plugin_formcreator_replaceHelpdesk()) {
-   Html::redirect(FORMCREATOR_ROOTDOC . '/front/formlist.php');
-}
-
-if (Session::getCurrentInterface() == "helpdesk") {
-   Html::helpHeader(__('Service catalog', 'formcreator'));
-} else {
-   Html::header(__('Service catalog', 'formcreator'));
-}
-
-if (PluginFormcreatorEntityconfig::getUsedConfig('is_dashboard_visible', Session::getActiveEntity()) == PluginFormcreatorEntityconfig::CONFIG_DASHBOARD_VISIBLE) {
-   $dashboard = new Glpi\Dashboard\Grid('plugin_formcreator_issue_counters', 33, 2, 'mini_core');
-   $dashboard->show(true);
-}
-
-$form = PluginFormcreatorCommon::getForm();
-$form->showServiceCatalog();
-
-echo "<br/>";
-echo "<br/>";
-echo "<br/>";
-
-
-//PATCH
-Search::show('PluginFormcreatorIssue');
-
-
-if (Session::getCurrentInterface() == "helpdesk") {
-   Html::helpFooter();
-} else {
-   Html::footer();
-}
+   $("span.avatar").parent().closest('a').removeAttr("data-bs-toggle");
+   $("span.avatar").parent().closest('a').removeClass("dropdown-toggle");
+   $("span.avatar").parent().closest('a').css("content","none");
+   $("span.avatar").parent().closest('a').css("cursor","default");
+   $("span.avatar").hide();
+});

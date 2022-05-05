@@ -63,6 +63,22 @@ class PluginFormcreatorEntityconfig extends CommonDBTM {
    const CONFIG_DASHBOARD_HIDDEN = 0;
    const CONFIG_DASHBOARD_VISIBLE = 1;
 
+   const CONFIG_RESERVATION_HIDDEN = 0;
+   const CONFIG_RESERVATION_VISIBLE = 1;
+
+   const CONFIG_FAQ_HIDDEN = 0;
+   const CONFIG_FAQ_VISIBLE = 1;
+
+   const CONFIG_CATEGORIE_HIDDEN = 0;
+   const CONFIG_CATEGORIE_VISIBLE = 1;
+
+   const CONFIG_SORT_HIDDEN = 0;
+   const CONFIG_SORT_VISIBLE = 1;
+
+   const CONFIG_SEARCH_ISSUE_HIDDEN = 0;
+   const CONFIG_SEARCH_ISSUE_VISIBLE = 1;
+
+
    /**
     * @var bool $dohistory maintain history
     */
@@ -132,6 +148,46 @@ class PluginFormcreatorEntityconfig extends CommonDBTM {
          self::CONFIG_PARENT            => __('Inheritance of the parent entity'),
          self::CONFIG_DASHBOARD_VISIBLE => __('Visible', 'formcreator'),
          self::CONFIG_DASHBOARD_HIDDEN  => __('Hidden', 'formcreator'),
+      ];
+   }
+
+   public static function getEnumReservationVisibility() : array {
+      return [
+         self::CONFIG_PARENT            => __('Inheritance of the parent entity'),
+         self::CONFIG_RESERVATION_VISIBLE => __('Visible', 'formcreator'),
+         self::CONFIG_RESERVATION_HIDDEN  => __('Hidden', 'formcreator'),
+      ];
+   }
+
+   public static function getEnumFaqVisibility() : array {
+      return [
+         self::CONFIG_PARENT            => __('Inheritance of the parent entity'),
+         self::CONFIG_FAQ_VISIBLE => __('Visible', 'formcreator'),
+         self::CONFIG_FAQ_HIDDEN  => __('Hidden', 'formcreator'),
+      ];
+   }
+
+   public static function getEnumCategorieVisibility() : array {
+      return [
+         self::CONFIG_PARENT            => __('Inheritance of the parent entity'),
+         self::CONFIG_CATEGORIE_VISIBLE => __('Visible', 'formcreator'),
+         self::CONFIG_CATEGORIE_HIDDEN  => __('Hidden', 'formcreator'),
+      ];
+   }
+
+   public static function getEnumSortVisibility() : array {
+      return [
+         self::CONFIG_PARENT            => __('Inheritance of the parent entity'),
+         self::CONFIG_SORT_VISIBLE => __('Visible', 'formcreator'),
+         self::CONFIG_SORT_HIDDEN  => __('Hidden', 'formcreator'),
+      ];
+   }
+
+   public static function getEnumSearchIssueVisibility() : array {
+      return [
+         self::CONFIG_PARENT            => __('Inheritance of the parent entity'),
+         self::CONFIG_SEARCH_ISSUE_VISIBLE => __('Visible', 'formcreator'),
+         self::CONFIG_SEARCH_ISSUE_HIDDEN  => __('Hidden', 'formcreator'),
       ];
    }
 
@@ -205,7 +261,7 @@ class PluginFormcreatorEntityconfig extends CommonDBTM {
       }
 
       echo "<table class='tab_cadre_fixe'>";
-      echo "<tr><th colspan='2'>".__('Helpdesk', 'formcreator')."</th></tr>";
+      echo "<tr><th colspan='4'>".__('Helpdesk', 'formcreator')."</th></tr>";
 
       $elements = self::getEnumHelpdeskMode();
       if ($entityId == 0) {
@@ -221,7 +277,7 @@ class PluginFormcreatorEntityconfig extends CommonDBTM {
          echo '<br>';
          Entity::inheritedValue($elements[$tid], true);
       }
-      echo '</td></tr>';
+      echo '</td><td></td><td></td></tr>';
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Default Form list mode', 'formcreator')."</td>";
@@ -235,7 +291,7 @@ class PluginFormcreatorEntityconfig extends CommonDBTM {
          echo '<br>';
          Entity::inheritedValue($elements[$tid], true);
       }
-      echo '</td></tr>';
+      echo '</td><td></td><td></td></tr>';
 
       $elements = self::getEnumSort();
       if ($entityId == 0) {
@@ -250,6 +306,23 @@ class PluginFormcreatorEntityconfig extends CommonDBTM {
          echo '<br>';
          Entity::inheritedValue($elements[$tid], true);
       }
+      echo '</td>';
+
+
+      // Sort visibility
+      $elements = self::getEnumSortVisibility();
+      if ($entityId == 0) {
+         unset($elements[self::CONFIG_PARENT]);
+      }
+
+      echo "<td>".__('Sort option')."</td>";
+      echo "<td>";
+      Dropdown::showFromArray('is_sort_visible', $elements, ['value' => $this->fields['is_sort_visible']]);
+      if ($this->fields['is_sort_visible'] == self::CONFIG_PARENT) {
+         $tid = self::getUsedConfig('is_sort_visible', $entityId);
+         echo '<br>';
+         Entity::inheritedValue($elements[$tid], true);
+      }
       echo '</td></tr>';
 
       // Knowledge base settiing : merged with forms (legacy) separated menu on the left
@@ -260,9 +333,37 @@ class PluginFormcreatorEntityconfig extends CommonDBTM {
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Knowledge base', 'formcreator')."</td>";
       echo "<td>";
-      Dropdown::showFromArray('is_kb_separated', $elements, ['value' => $this->fields['is_kb_separated']]);
+      Dropdown::showFromArray('is_kb_separated', $elements, ['value' => $this->fields['is_kb_separated'],  'on_change' => 'display_kb_menu_visibility(this)']);
       if ($this->fields['is_kb_separated'] == self::CONFIG_PARENT) {
          $tid = self::getUsedConfig('is_kb_separated', $entityId);
+         echo '<br>';
+         Entity::inheritedValue($elements[$tid], true);
+      }
+
+      echo Html::scriptBlock("
+         var display_kb_menu_visibility = function(select) {
+            if (select.value == 1) {
+               $(\"select[name=is_faq_visible]\").removeAttr('disabled');
+            } else {
+               $(\"select[name=is_faq_visible]\").val('0');
+               $(\"select[name=is_faq_visible]\").change();
+
+               $(\"select[name=is_faq_visible]\").attr('disabled', 'disabled');
+            }
+         };
+      ");
+      echo '</td>';
+
+      // Knowledge base visibility
+      $elements = self::getEnumFaqVisibility();
+      if ($entityId == 0) {
+         unset($elements[self::CONFIG_PARENT]);
+      }
+      echo "<td>".__('Menu \'Knowledge base\'', 'formcreator')."</td>";
+      echo "<td>";
+      Dropdown::showFromArray('is_faq_visible', $elements, ['value' => $this->fields['is_faq_visible']]);
+      if ($this->fields['is_faq_visible'] == self::CONFIG_PARENT) {
+         $tid = self::getUsedConfig('is_faq_visible', $entityId);
          echo '<br>';
          Entity::inheritedValue($elements[$tid], true);
       }
@@ -281,7 +382,7 @@ class PluginFormcreatorEntityconfig extends CommonDBTM {
          echo '<br>';
          Entity::inheritedValue($elements[$tid], true);
       }
-      echo '</td></tr>';
+      echo '</td><td></td><td></td></tr>';
 
       // Dashboard visibility
       $elements = self::getEnumDashboardVisibility();
@@ -297,7 +398,57 @@ class PluginFormcreatorEntityconfig extends CommonDBTM {
          echo '<br>';
          Entity::inheritedValue($elements[$tid], true);
       }
-      echo '</td></tr>';
+      echo '</td><td></td><td></td></tr>';
+
+      // Reservation visibility
+      $elements = self::getEnumReservationVisibility();
+      if ($entityId == 0) {
+         unset($elements[self::CONFIG_PARENT]);
+      }
+      echo "<tr class='tab_bg_1'>";
+      echo "<td>".__('Menu \'Reservation\'')."</td>";
+      echo "<td>";
+      Dropdown::showFromArray('is_reservation_visible', $elements, ['value' => $this->fields['is_reservation_visible']]);
+      if ($this->fields['is_reservation_visible'] == self::CONFIG_PARENT) {
+         $tid = self::getUsedConfig('is_reservation_visible', $entityId);
+         echo '<br>';
+         Entity::inheritedValue($elements[$tid], true);
+      }
+      echo '</td><td></td><td></td></tr>';
+
+
+      // Categorie visibility
+      $elements = self::getEnumCategorieVisibility();
+      if ($entityId == 0) {
+         unset($elements[self::CONFIG_PARENT]);
+      }
+      echo "<tr class='tab_bg_1'>";
+      echo "<td>".__('Forms Categories')."</td>";
+      echo "<td>";
+      Dropdown::showFromArray('is_categorie_visible', $elements, ['value' => $this->fields['is_categorie_visible']]);
+      if ($this->fields['is_categorie_visible'] == self::CONFIG_PARENT) {
+         $tid = self::getUsedConfig('is_categorie_visible', $entityId);
+         echo '<br>';
+         Entity::inheritedValue($elements[$tid], true);
+      }
+      echo '</td><td></td><td></td></tr>';
+
+
+      // Search issue visibility
+      $elements = self::getEnumSearchIssueVisibility();
+      if ($entityId == 0) {
+         unset($elements[self::CONFIG_PARENT]);
+      }
+      echo "<tr class='tab_bg_1'>";
+      echo "<td>".__('Search issue')."</td>";
+      echo "<td>";
+      Dropdown::showFromArray('is_search_issue_visible', $elements, ['value' => $this->fields['is_search_issue_visible']]);
+      if ($this->fields['is_search_issue_visible'] == self::CONFIG_PARENT) {
+         $tid = self::getUsedConfig('is_search_issue_visible', $entityId);
+         echo '<br>';
+         Entity::inheritedValue($elements[$tid], true);
+      }
+      echo '</td><td></td><td></td></tr>';
 
       // header visibility
       $elements = self::getEnumHeaderVisibility();
@@ -313,12 +464,12 @@ class PluginFormcreatorEntityconfig extends CommonDBTM {
          echo '<br>';
          Entity::inheritedValue($elements[$tid], true);
       }
-      echo '</td></tr>';
+      echo '</td><td></td><td></td></tr>';
 
       // header
       echo "<tr class='tab_bg_1'>";
       echo "<td>" . _n('Header', 'Headers', 1, 'formcreator') . "</td>";
-      echo "<td>";
+      echo "<td colspan='3'>";
       echo Html::textarea([
          'name'            => 'header',
          'value'           => $this->fields['header'],
